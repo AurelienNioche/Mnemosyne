@@ -128,5 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Data
 logs.db
 logs.db-journal
+/mnemosyne-data/
+
+ # Django migrations
+*/migrations/*
+!*/migrations/__init__.py
