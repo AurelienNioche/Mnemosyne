@@ -154,6 +154,9 @@ class ScienceLogParser(object):
                 continue
             try:
                 self._parse_line(line)
+            except KeyboardInterrupt:
+                print("Interrupted!")
+                return True
             except:
                 print("Ignoring error in file '%s' while parsing line:\n%s" %
                     (filename, line))

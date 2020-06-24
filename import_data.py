@@ -6,6 +6,8 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "MnemosyneDjango.settings")
 django.setup()
 
+from django.db import transaction
+
 import os
 import sys
 
@@ -47,15 +49,20 @@ class LogDatabase(object):
             print("(%d/%d) %1.1f%% %s" % (counter + 1, filenames_count,
                 (counter + 1.) / filenames_count * 100,
                 os.path.basename(filename)))
+            
+            interrupted = False
             try:
-                self.parser.parse(filename)
+                interrupted = self.parser.parse(filename)
                 i += 1
             except KeyboardInterrupt:
-                print("Interrupted!")
-                self.commit()
-                exit()
+                interrupted = True
             except:
                 print("Can't open file, ignoring.")
+            if interrupted:
+                print("Interrupted!")
+                # self.commit()
+                exit()
+                
             self.parsed_logs.append(ParsedLogs(log_name=log_name))
             if i >= self.MAX_BEFORE_COMMIT:
                 print("Committing...", flush=True, end=' ')
@@ -66,11 +73,16 @@ class LogDatabase(object):
         self._create_indexes()
 
     def commit(self):
-
-        ParsedLogs.objects.bulk_create(self.parsed_logs)
-        Log.objects.bulk_create(self.log)
-        self.parsed_logs = []
-        self.log = []
+        try:
+            with transaction.atomic():
+                ParsedLogs.objects.bulk_create(self.parsed_logs)
+                Log.objects.bulk_create(self.log)
+                self.parsed_logs = []
+                self.log = []
+        except KeyboardInterrupt:
+            transaction.rollback()
+            print("Interrupted! Rolling back")
+            exit()
 
     def _delete_indexes(self):
         pass

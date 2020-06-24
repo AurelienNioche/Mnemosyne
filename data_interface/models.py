@@ -30,4 +30,4 @@ class Log(models.Model):
 
 class ParsedLogs(models.Model):
 
-    log_name = models.TextField()
+    log_name = models.TextField(db_index=True)
