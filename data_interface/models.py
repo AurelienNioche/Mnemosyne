@@ -4,10 +4,10 @@ from django.db import models
 # Create your models here.
 class Log(models.Model):
 
-    user_id = models.TextField()
+    user_id = models.TextField(db_index=True)
     event = models.BigIntegerField()
     timestamp = models.BigIntegerField()
-    object_id = models.TextField()
+    object_id = models.TextField(db_index=True)
     grade = models.BigIntegerField()
     easiness = models.FloatField()
     acq_reps = models.BigIntegerField()

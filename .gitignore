@@ -132,6 +132,7 @@ dmypy.json
 logs.db
 logs.db-journal
 /mnemosyne-data/
+*.csv
 
  # Django migrations
 */migrations/*
