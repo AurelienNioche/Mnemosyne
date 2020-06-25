@@ -137,3 +137,6 @@ logs.db-journal
  # Django migrations
 */migrations/*
 !*/migrations/__init__.py
+
+# Pycharm
+.idea/*
