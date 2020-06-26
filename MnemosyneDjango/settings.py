@@ -82,6 +82,11 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '5432',
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+            # 'default_transaction_isolation': 'read committed',
+            # 'timezone': 'UTC'
+        }
     }
 }
 

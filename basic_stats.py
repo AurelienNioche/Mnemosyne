@@ -29,25 +29,28 @@ LIMIT_BULK = 1000
 # df.to_csv('counts_user.csv')
 # print("done!")
 
-print("Querying...")
-t = timezone.now()
-entries = Log.objects.distinct("user_id", "object_id")
-print(f"Done! [{timezone.now()-t}]")
+# print("Querying...")
+# t = timezone.now()
+# entries = Log.objects.distinct("user_id", "object_id").iterator()
+# print(f"Done! [{timezone.now()-t}]")
 
-print("Counting...")
-t = timezone.now()
+# print("Counting...")
+# t = timezone.now()
 n = 21249531   # entries.count()
-print(f"Done! [{timezone.now()-t}]")
+# print(f"Done! [{timezone.now()-t}]")
 
 info_entries = []
 i_entry = 0
-for e in tqdm(entries, total=n):
+i = 0
+for e in Log.objects.distinct("user_id", "object_id").iterator():
+    print(f"Get user_id and object id for entry {i}", end='\r')
     u, o = e.user_id, e.object_id
     c = Log.objects.filter(user_id=u, object_id=o).count()
     info_entries.append(
         Info(user_id=u, object_id=o, user_object_pair_id=u+'-'+o, count=c)
     )
     i_entry += 1
+    i += 1
     if i_entry == LIMIT_BULK:
         Info.objects.bulk_create(info_entries)
         info_entries = []
