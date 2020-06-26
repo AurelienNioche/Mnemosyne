@@ -31,3 +31,11 @@ class Log(models.Model):
 class ParsedLogs(models.Model):
 
     log_name = models.TextField(db_index=True)
+
+
+class Info(models.Model):
+
+    user_id = models.TextField()
+    object_id = models.TextField()
+    user_object_pair_id = models.TextField()
+    count = models.IntegerField()

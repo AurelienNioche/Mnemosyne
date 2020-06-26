@@ -3,10 +3,14 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "MnemosyneDjango.settings")
 django.setup()
 
+from django.utils import timezone
+
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
-from data_interface.models import Log
+from data_interface.models import Log, Info
+
+LIMIT_BULK = 1000
 
 # N_USER = 23512
 #
@@ -25,21 +29,27 @@ from data_interface.models import Log
 # df.to_csv('counts_user.csv')
 # print("done!")
 
-v = Log.objects.distinct("user_id", "object_id").values_list("user_id", "object_id")
-n = len(v)
+print("Querying...")
+t = timezone.now()
+entries = Log.objects.distinct("user_id", "object_id")
+print(f"Done! [{timezone.now()-t}]")
 
-counts = {
-    "user_id": np.zeros(n, dtype=str),
-    "object_id": np.zeros(n, dtype=str),
-    "count": np.zeros(n)
-}
-for i, (u, o) in tqdm(enumerate(v), total=n):
+print("Counting...")
+t = timezone.now()
+n = 21249531   # entries.count()
+print(f"Done! [{timezone.now()-t}]")
+
+info_entries = []
+i_entry = 0
+for e in tqdm(entries, total=n):
+    u, o = e.user_id, e.object_id
     c = Log.objects.filter(user_id=u, object_id=o).count()
-    counts["count"][i] = c
-    counts["user_id"][i] = u
-    counts["object_id"][i] = o
+    info_entries.append(
+        Info(user_id=u, object_id=o, user_object_pair_id=u+'-'+o, count=c)
+    )
+    i_entry += 1
+    if i_entry == LIMIT_BULK:
+        Info.objects.bulk_create(info_entries)
+        info_entries = []
+        i_entry = 0
 
-print("backing up...", flush=True, end=" ")
-df = pd.DataFrame(counts)
-df.to_csv('counts_user_item_pair.csv')
-print("done!")
