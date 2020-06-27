@@ -37,7 +37,6 @@ class LogDatabase(object):
         filenames_count = len(filenames)
         i = 0
         for counter, filename in enumerate(filenames):
-            sys.stdout.flush()
             log_name = os.path.basename(filename)
             entry = ParsedLogs.objects.filter(log_name=log_name).first()
             if entry is not None:
@@ -175,7 +174,6 @@ class LogDatabase(object):
         ret_reps, lapses, acq_reps_since_lapse, ret_reps_since_lapse,
         scheduled_interval, actual_interval, thinking_time,
         next_rep, scheduler_data):
-        pass
         # self.con.execute(\
         #     """insert into log(user_id, event, timestamp, object_id, grade,
         #     easiness, acq_reps, ret_reps, lapses, acq_reps_since_lapse,

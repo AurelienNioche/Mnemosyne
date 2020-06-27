@@ -37,5 +37,5 @@ class Info(models.Model):
 
     user_id = models.TextField()
     object_id = models.TextField()
-    user_object_pair_id = models.TextField()
+    user_object_pair_id = models.TextField(db_index=True)
     count = models.IntegerField()

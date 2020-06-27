@@ -43,16 +43,18 @@ info_entries = []
 i_entry = 0
 i = 0
 for e in Log.objects.distinct("user_id", "object_id").iterator():
-    print(f"Get user_id and object id for entry {i}", end='\r')
+    print(f"\rProcessing pair {i} ({100*i/n:.1f}%)", end='')
     u, o = e.user_id, e.object_id
-    c = Log.objects.filter(user_id=u, object_id=o).count()
-    info_entries.append(
-        Info(user_id=u, object_id=o, user_object_pair_id=u+'-'+o, count=c)
-    )
-    i_entry += 1
-    i += 1
-    if i_entry == LIMIT_BULK:
-        Info.objects.bulk_create(info_entries)
-        info_entries = []
-        i_entry = 0
+    user_object_pair_id = u+'-'+o
+    if Info.objects.filter(user_object_pair_id=user_object_pair_id).first() is None:
+        c = Log.objects.filter(user_id=u, object_id=o).count()
+        info_entries.append(
+            Info(user_id=u, object_id=o, user_object_pair_id=user_object_pair_id, count=c)
+        )
+        i_entry += 1
+        if i_entry == LIMIT_BULK:
+            Info.objects.bulk_create(info_entries)
+            info_entries = []
+            i_entry = 0
 
+    i += 1
