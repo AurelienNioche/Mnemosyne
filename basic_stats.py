@@ -46,10 +46,12 @@ for e in Log.objects.distinct("user_id", "object_id").iterator():
     print(f"\rProcessing pair {i} ({100*i/n:.1f}%)", end='')
     u, o = e.user_id, e.object_id
     user_object_pair_id = u+'-'+o
-    if Info.objects.filter(user_object_pair_id=user_object_pair_id).first() is None:
+    if Info.objects.filter(user_object_pair_id=user_object_pair_id).first() \
+            is None:
         c = Log.objects.filter(user_id=u, object_id=o).count()
         info_entries.append(
-            Info(user_id=u, object_id=o, user_object_pair_id=user_object_pair_id, count=c)
+            Info(user_id=u, object_id=o,
+                 user_object_pair_id=user_object_pair_id, count=c)
         )
         i_entry += 1
         if i_entry == LIMIT_BULK:
